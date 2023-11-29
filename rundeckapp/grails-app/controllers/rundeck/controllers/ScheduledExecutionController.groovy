@@ -471,30 +471,8 @@ class ScheduledExecutionController  extends ControllerBase{
         if (params.opt && (params.opt instanceof Map)) {
             dataMap.selectedoptsmap = params.opt
         }
-        //add scm export status
-        def projectResource = rundeckAuthContextProcessor.authResourceForProject(params.project)
-        if (rundeckAuthContextProcessor.authorizeApplicationResourceAny(authContext,
-                                                             projectResource,
-                                                             [AuthConstants.ACTION_ADMIN, AuthConstants.ACTION_APP_ADMIN, AuthConstants.ACTION_EXPORT,
-                                                              AuthConstants.ACTION_SCM_EXPORT])) {
-            def scmExportActionsForShowDropdown = scheduledExecutionService.scmActionMenuOptions(
-                    scheduledExecution.project,
-                    authContext,
-                    scheduledExecution
-            )
-            dataMap << scmExportActionsForShowDropdown
-        }
-        if (rundeckAuthContextProcessor.authorizeApplicationResourceAny(authContext,
-                                                             projectResource,
-                                                             [AuthConstants.ACTION_ADMIN, AuthConstants.ACTION_APP_ADMIN, AuthConstants.ACTION_IMPORT,
-                                                              AuthConstants.ACTION_SCM_IMPORT])) {
-            def scmImportActionsForShowDropdown = scheduledExecutionService.scmActionMenuOptions(
-                    scheduledExecution.project,
-                    authContext,
-                    scheduledExecution
-            )
-            dataMap << scmImportActionsForShowDropdown
-        }
+
+        dataMap << getScmActionMenuOptions(scheduledExecution)
 
         withFormat{
             html{
@@ -529,6 +507,70 @@ class ScheduledExecutionController  extends ControllerBase{
             }
         }
     }
+
+    private Map getScmActionMenuOptions(scheduledExecution) {
+        AuthContext authContext = rundeckAuthContextProcessor.getAuthContextForSubjectAndProject(session.subject,scheduledExecution.project)
+        def projectResource = rundeckAuthContextProcessor.authResourceForProject(params.project)
+
+        def dataMap = [:]
+        if (rundeckAuthContextProcessor.authorizeApplicationResourceAny(authContext,
+                projectResource,
+                [AuthConstants.ACTION_ADMIN, AuthConstants.ACTION_APP_ADMIN, AuthConstants.ACTION_EXPORT,
+                 AuthConstants.ACTION_SCM_EXPORT])) {
+            def scmExportActionsForShowDropdown = scheduledExecutionService.scmActionMenuOptions(
+                    scheduledExecution.project,
+                    authContext,
+                    scheduledExecution
+            )
+            dataMap << scmExportActionsForShowDropdown
+        }
+        if (rundeckAuthContextProcessor.authorizeApplicationResourceAny(authContext,
+                projectResource,
+                [AuthConstants.ACTION_ADMIN, AuthConstants.ACTION_APP_ADMIN, AuthConstants.ACTION_IMPORT,
+                 AuthConstants.ACTION_SCM_IMPORT])) {
+            def scmImportActionsForShowDropdown = scheduledExecutionService.scmActionMenuOptions(
+                    scheduledExecution.project,
+                    authContext,
+                    scheduledExecution
+            )
+            dataMap << scmImportActionsForShowDropdown
+        }
+
+        return dataMap
+    }
+
+    def getScmStatusBadge() {
+        log.error("STARTING GET SCM STATUS BADGE: ID: ${params.id} PROJECT: ${params.project}")
+
+        ScheduledExecution scheduledExecution = scheduledExecutionService.getByIDorUUID( params.id )
+        Map scmData = getScmActionMenuOptions(scheduledExecution)
+
+        def importStatus = scmData['scmImportStatus']?.get(scheduledExecution.extid)
+        def exportStatus = scmData['scmExportStatus']?.get(scheduledExecution.extid)
+        Map statusBadgeModel = [
+                showClean: true,
+                linkClean: true,
+                exportStatus: exportStatus?.synchState?.toString(),
+                importStatus: importStatus?.synchState?.toString(),
+                text  : '',
+                notext: false,
+                link: true,
+                integration: 'export',
+                job: scheduledExecution,
+                exportCommit  : exportStatus?.commit,
+                importCommit  : importStatus?.commit,
+        ]
+
+        log.error(scmData.toString())
+        log.error(statusBadgeModel.toString())
+        log.error(":::::::FINISHING GET SCM STATUS BADGE")
+        render(template: "/scm/statusBadge", model: statusBadgeModel)
+    }
+
+    def getScmActionsForActionButton(){
+
+    }
+
     private static String getFname(name){
         final Pattern s = Pattern.compile("[\\r\\n \"\\\\]")
         def fname=name.replaceAll(s,'_')

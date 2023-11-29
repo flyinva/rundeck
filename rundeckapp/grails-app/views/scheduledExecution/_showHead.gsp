@@ -60,6 +60,12 @@
           </div>
         </g:if>
       </span>
+      <div id="scmStatusBadge">
+          <div id="scmLoadingSpinner" style="display: block;">
+              <i class="fas fa-spinner fa-pulse"></i>
+              Loading Scm Data
+          </div>
+      </div>
       <g:render template="/scm/statusBadge"
                 model="[
                         showClean:true,
@@ -156,3 +162,29 @@
                   ]"/>
 </section>
 </div>
+
+<script type="text/javascript">
+    console.log("::::::::::::STARTING SHOWING HEAD")
+    function scmStatusBadgeAsyncLoad(statusBadgeUrl){
+        console.log("BINDING STATUS BADGE TO HEAD")
+        jQuery.ajax({
+            url:_genUrl(statusBadgeUrl),
+            type: 'GET',
+            success: function (data,status,jqxhr) {
+                if(data.error){
+                    console.log( "Failed to load scm status badge: " + (jqxhr.responseJSON && jqxhr.responseJSON.error? jqxhr.responseJSON.error: err))
+                    console.log(jqxhr)
+                }else{
+                    jQuery('#scmStatusBadge').html(data)
+                }
+            },
+            error: function (jqxhr,status,err) {
+                console.log( "Failed to load scm status badge: " + (jqxhr.responseJSON && jqxhr.responseJSON.error? jqxhr.responseJSON.error: err))
+                console.log(jqxhr)
+            }
+        })
+    }
+    scmStatusBadgeAsyncLoad(
+        "${enc(js:g.createLink(controller: 'scheduledExecution', action: 'getScmStatusBadge', params: [project: "${scheduledExecution.project}", id: "${scheduledExecution.id}"]))}"
+    )
+</script>
