@@ -4547,7 +4547,8 @@ class ScheduledExecutionService implements ApplicationContextAware, Initializing
                      executionLifecyclePlugins   : executionLifecyclePlugins,
                      projectNames                : fprojects,
                      globalVars                  : globals,
-                     jobComponents               : jobComponents
+                     jobComponents               : jobComponents,
+                     fileUploadPluginType        : fileUploadService.pluginType
         ]
 
         if(action == AuthConstants.ACTION_UPDATE){
