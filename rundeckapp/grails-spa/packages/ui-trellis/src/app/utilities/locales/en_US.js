@@ -657,6 +657,7 @@ const messages = {
     "Option.required.description": "Require this option to have a non-blank value when running the Job",
     "Option.hidden.label": "Should be hidden",
     "form.option.regex.placeholder":"Enter a Regular Expression",
+    "option.click.to.edit.title": "Click to edit"
 
 }
 
