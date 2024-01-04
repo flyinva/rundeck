@@ -111,6 +111,8 @@ export default defineComponent({
         };
         await this.jobPageStore.load();
         this.loaded = true;
+
+        console.log("::::::::::::::::::JOBlISTPAGE MOUNTED!!!")
     },
 });
 </script>

@@ -6,6 +6,8 @@ export async function getProjectMeta(project: string, meta: string='*'): Promise
     if (resp.status !== 200) {
         throw {message: resp.data.message, response: resp}
     } else {
+        console.log(resp.data)
+        console.log("------------------------------------------------")
         return resp.data
     }
 }

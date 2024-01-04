@@ -34,6 +34,7 @@ import {
     JobPageStoreInjectionKey,
 } from "@/library/stores/JobPageStore";
 import { defineComponent, inject } from "vue";
+import {ScmTextUtilities} from "../../../../library/utilities/scm/scmTextUtilities";
 
 export default defineComponent({
     name: "JobListScmStatus",
@@ -45,6 +46,11 @@ export default defineComponent({
         return {
             jobPageStore,
         };
+    },
+    data(){
+      return {
+        scmTextProcessor: new ScmTextUtilities(this.$t)
+      }
     },
     computed: {
         scmImport: function () {
@@ -73,46 +79,10 @@ export default defineComponent({
             }
         },
         importDisplayText() {
-            switch (this.importState) {
-                case "IMPORT_NEEDED":
-                    return this.$t(
-                        "scm.import.status.IMPORT_NEEDED.display.text"
-                    );
-                case "REFRESH_NEEDED":
-                    return this.$t(
-                        "scm.import.status.REFRESH_NEEDED.display.text"
-                    );
-                case "UNKNOWN":
-                    return this.$t("scm.import.status.UNKNOWN.display.text");
-                case "CLEAN":
-                    return this.$t("scm.import.status.CLEAN.display.text");
-                case "LOADING":
-                    return this.$t("scm.import.status.LOADING.display.text");
-            }
-            return this.importState;
+            return this.scmTextProcessor.importDisplayText(this.importState)
         },
         exportDisplayText() {
-            switch (this.exportState) {
-                case "EXPORT_NEEDED":
-                    return this.$t(
-                        "scm.export.status.EXPORT_NEEDED.display.text"
-                    );
-                case "CREATE_NEEDED":
-                    return this.$t(
-                        "scm.export.status.CREATE_NEEDED.display.text"
-                    );
-                case "REFRESH_NEEDED":
-                    return this.$t(
-                        "scm.export.status.REFRESH_NEEDED.display.text"
-                    );
-                case "DELETED":
-                    return this.$t("scm.export.status.DELETED.display.text");
-                case "CLEAN":
-                    return this.$t("scm.export.status.CLEAN.display.text");
-                case "LOADING":
-                    return this.$t("scm.export.status.LOADING.display.text");
-            }
-            return this.exportState;
+          return this.scmTextProcessor.exportDisplayText(this.exportState)
         },
         exportMessage() {
             return this.scmExport?.status?.message;

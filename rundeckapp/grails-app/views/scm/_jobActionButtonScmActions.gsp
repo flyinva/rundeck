@@ -79,9 +79,6 @@
     </g:each>
     <g:unless test="${importStateUnknown}">
         <li>
-            <div>
-                HOLAHOLAHOLAAAAA job action button
-            </div>
             <g:link controller="scm"
                     params="[project: scheduledExecution.project,id:scheduledExecution.extid,integration: 'import']"
                     action="diff">

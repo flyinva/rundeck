@@ -297,6 +297,7 @@ export default defineComponent({
     mounted() {
         eventBus.on("job-action", this.confirmAction);
         eventBus.on("job-action-single", this.confirmActionSingle);
+        console.log(":::::::::::::::::::::::::::::::::JOB BULK EDIT CONTROLS MOUNTED")
     },
 });
 </script>

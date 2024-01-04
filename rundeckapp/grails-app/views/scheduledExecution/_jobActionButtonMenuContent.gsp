@@ -15,6 +15,8 @@
   --}%
 
 <%@ page import="org.rundeck.core.auth.AuthConstants" %>
+<asset:javascript src="static/pages/job/head/scm-action-buttons.js" asset-defer="true" />
+
 <g:set var="authUpdate" value="${auth.jobAllowedTest(job: scheduledExecution, action: [AuthConstants.ACTION_UPDATE])}"/>
 <g:set var="authRead" value="${auth.jobAllowedTest(job: scheduledExecution, any: true, action: [AuthConstants.ACTION_READ])}"/>
 <g:set var="authDelete" value="${auth.jobAllowedTest(job: scheduledExecution, action: [AuthConstants.ACTION_DELETE])}"/>
@@ -195,18 +197,12 @@
     </li>
 </g:if>
 
-<g:render template="/scheduledExecution/jobActionButtonScmActions" model="[scheduledExecution:scheduledExecution, isScheduled: isScheduled]"/>
+<div class="vue-ui-socket dropdown-menu ${dropdownClass?:''}" id="scmActionsButtons" style="width: 100%; margin-top: 0;">
+    <ui-socket section="job-head" location="job-action-button" socket-data="${enc(attr: [ jobUuid: scheduledExecution.uuid ].encodeAsJSON())}"></ui-socket>
+</div>
 
 <g:if test="${renderedActions<1}">
     <li class="dropdown-header">
         <g:message code="scheduledExecution.action.menu.none-available" />
     </li>
 </g:if>
-
-<script type="text/javascript">
-    function jobActionButtonScmActionsAsyncLoad(scmActionsUrl){
-        console.log("BINDING SCM ACTION BUTTONS")
-        console.log(scmActionsUrl)
-    }
-    jobActionButtonScmActionsAsyncLoad("http://urlexample")
-</script>

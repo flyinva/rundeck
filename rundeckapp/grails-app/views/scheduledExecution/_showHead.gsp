@@ -15,6 +15,7 @@
   --}%
 
 <%@ page import="org.rundeck.core.auth.AuthConstants; rundeck.ScheduledExecution" %>
+<asset:javascript src="static/pages/job/head/scm-status-badge.js" asset-defer="true" />
 
 <div class="jobInfoSection">
     <g:if test="${scheduledExecution.groupPath}">
@@ -37,9 +38,6 @@
             any: true,
             name: scheduledExecution.project
     )}"/>
-    <g:set var="exportStatus" value="${authProjectExport && scmExportEnabled ? scmExportStatus?.get(scheduledExecution.extid) :null}"/>
-    <g:set var="importStatus" value="${authProjectImport && scmImportEnabled ? scmImportStatus?.get(scheduledExecution.extid):null}"/>
-
       <span>
       <g:if test="${includeExecStatus}">
           <b class="exec-status icon "
@@ -60,26 +58,12 @@
           </div>
         </g:if>
       </span>
-      <div id="scmStatusBadge">
-          <div id="scmLoadingSpinner" style="display: block;">
-              <i class="fas fa-spinner fa-pulse"></i>
-              Loading Scm Data
-          </div>
-      </div>
-      <g:render template="/scm/statusBadge"
-                model="[
-                        showClean:true,
-                        linkClean:true,
-                        exportStatus: exportStatus?.synchState?.toString(),
-                        importStatus: importStatus?.synchState?.toString(),
-                        text  : '',
-                        notext: false,
-                        link: true,
-                        integration:'export',
-                        job:scheduledExecution,
-                        exportCommit  : exportStatus?.commit,
-                        importCommit  : importStatus?.commit,
-                ]"/>
+
+      <g:if test="${includeStatusBadge}">
+      <span class="vue-ui-socket">
+          <ui-socket section="job-head" location="job-status-badge" socket-data="${enc(attr: [ jobUuid: scheduledExecution.uuid ].encodeAsJSON())}"></ui-socket>
+      </span>
+      </g:if>
 
       <g:if test="${ !scheduledExecution.hasExecutionEnabled()}">
           <span class=" label label-warning has_tooltip" data-toggle="tooltip"
@@ -162,29 +146,3 @@
                   ]"/>
 </section>
 </div>
-
-<script type="text/javascript">
-    console.log("::::::::::::STARTING SHOWING HEAD")
-    function scmStatusBadgeAsyncLoad(statusBadgeUrl){
-        console.log("BINDING STATUS BADGE TO HEAD")
-        jQuery.ajax({
-            url:_genUrl(statusBadgeUrl),
-            type: 'GET',
-            success: function (data,status,jqxhr) {
-                if(data.error){
-                    console.log( "Failed to load scm status badge: " + (jqxhr.responseJSON && jqxhr.responseJSON.error? jqxhr.responseJSON.error: err))
-                    console.log(jqxhr)
-                }else{
-                    jQuery('#scmStatusBadge').html(data)
-                }
-            },
-            error: function (jqxhr,status,err) {
-                console.log( "Failed to load scm status badge: " + (jqxhr.responseJSON && jqxhr.responseJSON.error? jqxhr.responseJSON.error: err))
-                console.log(jqxhr)
-            }
-        })
-    }
-    scmStatusBadgeAsyncLoad(
-        "${enc(js:g.createLink(controller: 'scheduledExecution', action: 'getScmStatusBadge', params: [project: "${scheduledExecution.project}", id: "${scheduledExecution.id}"]))}"
-    )
-</script>

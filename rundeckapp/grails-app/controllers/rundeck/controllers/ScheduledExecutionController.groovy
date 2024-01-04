@@ -103,6 +103,7 @@ import javax.servlet.http.HttpServletResponse
 import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 import java.util.stream.Collectors
+import java.util.Map
 
 @Controller()
 class ScheduledExecutionController  extends ControllerBase{
@@ -472,8 +473,6 @@ class ScheduledExecutionController  extends ControllerBase{
             dataMap.selectedoptsmap = params.opt
         }
 
-        dataMap << getScmActionMenuOptions(scheduledExecution)
-
         withFormat{
             html{
                 dataMap
@@ -506,69 +505,6 @@ class ScheduledExecutionController  extends ControllerBase{
                 flush(response)
             }
         }
-    }
-
-    private Map getScmActionMenuOptions(scheduledExecution) {
-        AuthContext authContext = rundeckAuthContextProcessor.getAuthContextForSubjectAndProject(session.subject,scheduledExecution.project)
-        def projectResource = rundeckAuthContextProcessor.authResourceForProject(params.project)
-
-        def dataMap = [:]
-        if (rundeckAuthContextProcessor.authorizeApplicationResourceAny(authContext,
-                projectResource,
-                [AuthConstants.ACTION_ADMIN, AuthConstants.ACTION_APP_ADMIN, AuthConstants.ACTION_EXPORT,
-                 AuthConstants.ACTION_SCM_EXPORT])) {
-            def scmExportActionsForShowDropdown = scheduledExecutionService.scmActionMenuOptions(
-                    scheduledExecution.project,
-                    authContext,
-                    scheduledExecution
-            )
-            dataMap << scmExportActionsForShowDropdown
-        }
-        if (rundeckAuthContextProcessor.authorizeApplicationResourceAny(authContext,
-                projectResource,
-                [AuthConstants.ACTION_ADMIN, AuthConstants.ACTION_APP_ADMIN, AuthConstants.ACTION_IMPORT,
-                 AuthConstants.ACTION_SCM_IMPORT])) {
-            def scmImportActionsForShowDropdown = scheduledExecutionService.scmActionMenuOptions(
-                    scheduledExecution.project,
-                    authContext,
-                    scheduledExecution
-            )
-            dataMap << scmImportActionsForShowDropdown
-        }
-
-        return dataMap
-    }
-
-    def getScmStatusBadge() {
-        log.error("STARTING GET SCM STATUS BADGE: ID: ${params.id} PROJECT: ${params.project}")
-
-        ScheduledExecution scheduledExecution = scheduledExecutionService.getByIDorUUID( params.id )
-        Map scmData = getScmActionMenuOptions(scheduledExecution)
-
-        def importStatus = scmData['scmImportStatus']?.get(scheduledExecution.extid)
-        def exportStatus = scmData['scmExportStatus']?.get(scheduledExecution.extid)
-        Map statusBadgeModel = [
-                showClean: true,
-                linkClean: true,
-                exportStatus: exportStatus?.synchState?.toString(),
-                importStatus: importStatus?.synchState?.toString(),
-                text  : '',
-                notext: false,
-                link: true,
-                integration: 'export',
-                job: scheduledExecution,
-                exportCommit  : exportStatus?.commit,
-                importCommit  : importStatus?.commit,
-        ]
-
-        log.error(scmData.toString())
-        log.error(statusBadgeModel.toString())
-        log.error(":::::::FINISHING GET SCM STATUS BADGE")
-        render(template: "/scm/statusBadge", model: statusBadgeModel)
-    }
-
-    def getScmActionsForActionButton(){
-
     }
 
     private static String getFname(name){
