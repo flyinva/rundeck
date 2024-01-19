@@ -1,7 +1,7 @@
 <template>
     <span v-if="!dataReady">
       <i class="fas fa-spinner fa-pulse"></i>
-      Loading Scm Data
+      <span v-if="showText">Loading Scm Data</span>
     </span>
     <template v-if="jobSynchState">
         <span :title="jobText" class="scm_status">
@@ -52,8 +52,7 @@ export default defineComponent({
         scmUtilities: new ScmTextUtilities(this.$t)
       }
     },
-    methods: {},
-    computed: {
+  computed: {
         jobSynchState(): String | undefined {
             return this.exportSynchState || this.importSynchState;
         },

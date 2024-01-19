@@ -93,7 +93,7 @@ export default defineComponent({
                     this.job
                 );
                 if(this.loadMeta && !this.job.meta){
-                    await this.jobPageStore.getJobBrowser().loadJobMeta(this.job)
+                  this.job.meta = await this.jobPageStore.getJobBrowser().loadJobMeta(this.job.id)
                 }
             }
         },

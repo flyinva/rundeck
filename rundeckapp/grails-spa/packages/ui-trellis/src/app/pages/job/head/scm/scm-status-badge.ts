@@ -22,13 +22,15 @@ function init() {
                     components: { JobScmStatus },
                     props: ["itemData"],
                     setup(props){
-                        let scmItemData = reactive({ job: { job: true, groupPath: "", id: props.itemData.jobUuid } })
+                        let scmItemData = reactive({ job: { job: true, groupPath: "", id: props.itemData.jobUuid, meta: undefined } })
                         let dataReady = ref(false)
+
+                        jobPageStore.getJobBrowser().loadJobMeta(scmItemData.job.id).then(jobMeta => {
+                            scmItemData.job.meta = jobMeta
+                            dataReady.value = true
+                        })
+
                         return { scmItemData, dataReady }
-                    },
-                    async mounted() {
-                        await jobPageStore.getJobBrowser().loadJobMeta(this.scmItemData.job)
-                        this.dataReady = true
                     },
                     template: `<job-scm-status
                         :itemData="scmItemData"
@@ -36,13 +38,7 @@ function init() {
                         :show-text="true"
                         :show-export="false"
                         :data-ready="dataReady"
-                    />`,
-                    updated(){
-                        console.log("SCM STATUS BADGE UPDATED!!!!")
-                        console.log(this.scmItemData)
-                        console.log(this.scmItemData.job)
-                        console.log("-----------------------------------------")
-                    }
+                    />`
                 })),
         },
     ]);

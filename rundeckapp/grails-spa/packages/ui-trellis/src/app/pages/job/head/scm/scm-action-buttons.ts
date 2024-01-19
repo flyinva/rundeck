@@ -27,11 +27,10 @@ function init() {
                         let job : JobBrowseItem = reactive({ job: true, groupPath: "", id: props.itemData.jobUuid })
                         provide(JobPageStoreInjectionKey, jobPageStore);
 
+                        jobPageStore.load()
+                        jobPageStore.getJobBrowser().loadJobMeta(job.id).then(jobMeta => job.meta = jobMeta)
+
                         return { jobPageStore, job }
-                    },
-                    async mounted() {
-                        await this.jobPageStore.load()
-                        await jobPageStore.getJobBrowser().loadJobMeta(this.job)
                     },
                     template: `<job-scm-actions :job="job"></job-scm-actions>`
                 })),

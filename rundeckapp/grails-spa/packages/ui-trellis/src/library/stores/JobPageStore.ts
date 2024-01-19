@@ -96,9 +96,6 @@ export class JobPageStore {
     }
     this.meta = await getProjectMeta(getRundeckContext().projectName)
 
-    console.log(":::::::::::.PROJECT META LOADED")
-    console.log(this.meta)
-    console.log("--------------------------------")
     const projAuthz = this.findMeta('authz')
     if (
       projAuthz?.types?.job &&

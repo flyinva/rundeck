@@ -94,8 +94,8 @@ export class JobBrowserStore extends JobBrowserStoreItem {
         }
     }
 
-    async loadJobMeta(job: JobBrowseItem) {
-        job.meta = await getJobMeta(this.jobPageStore.getProject(), job.id!, this.meta)
+    loadJobMeta(jobUuid: string) {
+        return getJobMeta(this.jobPageStore.getProject(), jobUuid, this.meta)
     }
 
     async refresh(path: string): Promise<JobBrowseItem[]> {
