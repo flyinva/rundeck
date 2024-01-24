@@ -7,10 +7,9 @@ export interface JobBrowseItem {
     meta?: JobBrowseMeta[];
 }
 
-export type JobBrowserMetaData = { [key: string]: any }
 export interface JobBrowseMeta {
     name: string;
-    data: JobBrowserMetaData;
+    data: { [key: string]: any };
 }
 export interface JobBrowseList {
   path: string

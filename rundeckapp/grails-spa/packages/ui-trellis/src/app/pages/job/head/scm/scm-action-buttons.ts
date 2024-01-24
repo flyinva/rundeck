@@ -1,41 +1,43 @@
-import {defineComponent, markRaw, provide, reactive} from 'vue'
-import {getRundeckContext} from '../../../../../library'
+import { defineComponent, markRaw, provide, reactive } from 'vue'
+import { getRundeckContext } from '../../../../../library'
 
 import moment from 'moment'
 import JobScmActions from '@/app/pages/job/browse/tree/JobScmActions.vue'
 import { JobBrowseItem } from "../../../../../library/types/jobs/JobBrowse";
 import { JobPageStoreInjectionKey } from "../../../../../library/stores/JobPageStore";
+import { observer } from "../../../../utilities/uiSocketObserver";
 
-function init() {
-    const rootStore = getRundeckContext().rootStore;
-    const page = rootStore.jobPageStore
-    const jobPageStore = reactive(page);
+const rootStore = getRundeckContext().rootStore;
+const jobPageStore = reactive(rootStore.jobPageStore);
+moment.locale(getRundeckContext().locale||'en_US')
+rootStore.ui.addItems([
+    {
+        section: "job-head",
+        location: "job-action-button",
+        visible: true,
+        widget: markRaw(
+            defineComponent({
+                name: "JobHeadScmActions",
+                components: { JobScmActions },
+                props: ["itemData"],
+                setup(props){
+                    let job : JobBrowseItem = reactive({ job: true, groupPath: "", id: props.itemData.jobUuid })
+                    provide(JobPageStoreInjectionKey, jobPageStore);
 
-    moment.locale(getRundeckContext().locale||'en_US')
+                    jobPageStore.load()
+                    jobPageStore.getJobBrowser().loadJobMeta(job.id).then(jobMeta => job.meta = jobMeta)
 
-    rootStore.ui.addItems([
-        {
-            section: "job-head",
-            location: "job-action-button",
-            visible: true,
-            widget: markRaw(
-                defineComponent({
-                    name: "JobHeadScmActions",
-                    components: { JobScmActions },
-                    props: ["itemData"],
-                    setup(props){
-                        let job : JobBrowseItem = reactive({ job: true, groupPath: "", id: props.itemData.jobUuid })
-                        provide(JobPageStoreInjectionKey, jobPageStore);
+                    return { jobPageStore, job }
+                },
+                template: `<job-scm-actions :job="job"></job-scm-actions>`
+            })
+        ),
+    },
+]);
 
-                        jobPageStore.load()
-                        jobPageStore.getJobBrowser().loadJobMeta(job.id).then(jobMeta => job.meta = jobMeta)
-
-                        return { jobPageStore, job }
-                    },
-                    template: `<job-scm-actions :job="job"></job-scm-actions>`
-                })),
-        },
-    ]);
-}
-
-window.addEventListener('DOMContentLoaded', init)
+window.addEventListener('DOMContentLoaded', () => {
+    let elem = document.getElementById("job_group_tree")
+    if (elem) {
+        observer.observe(elem, { subtree: true, childList: true })
+    }
+})

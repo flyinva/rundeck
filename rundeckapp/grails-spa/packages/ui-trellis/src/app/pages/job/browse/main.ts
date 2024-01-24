@@ -56,8 +56,6 @@ function init() {
   );
   const jobPageStore = reactive(page);
   const jobBrowserStore = reactive(browse)
-
-    console.log("::::::::::::::.BEFORE ADDING JobPageMain ITEMS TO STORE")
   rootStore.ui.addItems([
       {
           section: "job-list-page",
@@ -151,7 +149,6 @@ function init() {
           widget: markRaw(JobActionsMenu),
       },
   ]);
-  console.log("::::::::::::::.AFTER ADDING ITEMS TO STORE")
 }
 
 window.addEventListener('DOMContentLoaded', init)

@@ -60,9 +60,9 @@
       </span>
 
       <g:if test="${includeStatusBadge}">
-      <span class="vue-ui-socket">
-          <ui-socket section="job-head" location="job-status-badge" socket-data="${enc(attr: [ jobUuid: scheduledExecution.uuid ].encodeAsJSON())}"></ui-socket>
-      </span>
+          <span class="vue-ui-socket">
+              <ui-socket section="job-head" location="job-status-badge" socket-data="${enc(attr: [ jobUuid: scheduledExecution.uuid ].encodeAsJSON())}"></ui-socket>
+          </span>
       </g:if>
 
       <g:if test="${ !scheduledExecution.hasExecutionEnabled()}">

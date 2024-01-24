@@ -103,7 +103,6 @@ import javax.servlet.http.HttpServletResponse
 import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 import java.util.stream.Collectors
-import java.util.Map
 
 @Controller()
 class ScheduledExecutionController  extends ControllerBase{
@@ -241,8 +240,6 @@ class ScheduledExecutionController  extends ControllerBase{
     @GrailsCompileStatic
     def actionMenuFragment(){
         ScheduledExecution scheduledExecution = authorizingJob.resource
-        String project = scheduledExecution.project
-        AuthorizingProject authorizingProject = authorizingProject(project)
 
         def model=[
                 scheduledExecution  : scheduledExecution,
@@ -250,15 +247,6 @@ class ScheduledExecutionController  extends ControllerBase{
                 jobDeleteSingle     : params.jobDeleteSingle,
                 isScheduled         : scheduledExecutionService.isScheduled(scheduledExecution)
         ]
-
-        if (authorizingProject.isAuthorized(RundeckAccess.Project.APP_SCM_EXPORT)) {
-            def scmExportOptions = scheduledExecutionService.scmActionMenuOptions(project, authorizingProject.authContext, scheduledExecution) as LinkedHashMap<String, Object>
-            model << scmExportOptions
-        }
-        if (authorizingProject.isAuthorized(RundeckAccess.Project.APP_SCM_IMPORT)) {
-            def scmImportOptions = scheduledExecutionService.scmActionMenuOptions(project, authorizingProject.authContext, scheduledExecution) as LinkedHashMap<String, Object>
-            model << scmImportOptions
-        }
 
         render(template: '/scheduledExecution/jobActionButtonMenuContent', model: model)
     }
@@ -506,7 +494,6 @@ class ScheduledExecutionController  extends ControllerBase{
             }
         }
     }
-
     private static String getFname(name){
         final Pattern s = Pattern.compile("[\\r\\n \"\\\\]")
         def fname=name.replaceAll(s,'_')

@@ -95,7 +95,6 @@ export class JobPageStore {
       return
     }
     this.meta = await getProjectMeta(getRundeckContext().projectName)
-
     const projAuthz = this.findMeta('authz')
     if (
       projAuthz?.types?.job &&

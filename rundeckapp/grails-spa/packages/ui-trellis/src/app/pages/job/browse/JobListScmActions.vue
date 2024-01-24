@@ -1,21 +1,15 @@
 <template>
-    <template v-if="scmDataReady">
-        <li>
-            <i class="fas fa-spinner fa-pulse"></i>
-            Loading Scm Actions
-        </li>
-    </template>
-    <template v-if="scmExportEnabled">
-        <li v-if="scmExportActions" class="divider"></li>
+    <template v-if="scmExport?.enabled">
+        <li v-if="scmExport?.actions" class="divider"></li>
         <li
-            v-if="scmExportActions"
+            v-if="scmExport?.actions"
             role="presentation"
             class="dropdown-header"
         >
             <i class="glyphicon glyphicon-circle-arrow-right" />
             {{ $t("scm.export.actions.title") }}
         </li>
-        <li v-for="action in scmExportActions">
+        <li v-for="action in scmExport?.actions">
             <a
                 :href="
                     jobPageStore.createProjectScmActionHref(action.id, 'export')
@@ -26,17 +20,17 @@
             </a>
         </li>
     </template>
-    <template v-if="scmImportEnabled">
-        <li v-if="scmImportActions" class="divider"></li>
+    <template v-if="scmImport?.enabled">
+        <li v-if="scmImport?.actions" class="divider"></li>
         <li
-            v-if="scmImportActions"
+            v-if="scmImport?.actions"
             role="presentation"
             class="dropdown-header"
         >
             <i class="glyphicon glyphicon-circle-arrow-left" />
             {{ $t("scm.import.actions.title") }}
         </li>
-        <li v-for="action in scmImportActions">
+        <li v-for="action in scmImport?.actions">
             <a
                 :href="
                     jobPageStore.createProjectScmActionHref(action.id, 'import')
@@ -101,9 +95,7 @@ import {
     JobPageStoreInjectionKey,
 } from "@/library/stores/JobPageStore";
 import { JobBrowseMeta } from "@/library/types/jobs/JobBrowse";
-import {defineComponent, inject, PropType, ref} from "vue";
-import {JobBrowseItem} from "../../../../library/types/jobs/JobBrowse";
-import {ScmMeta} from "../../../../library/interfaces/scm/ScmMeta";
+import { defineComponent, inject, ref } from "vue";
 
 interface ScmIntegrationMeta {
     enabled: boolean;
@@ -117,26 +109,15 @@ interface ScmAction {
     description: string;
 }
 
-const EXPORT_META_KEY = "scmExport"
-const IMPORT_META_KEY = "scmImport"
-
 export default defineComponent({
     name: "JobListScmActions",
-    props: {
-        jobPageStore: {
-            type: Object as PropType<JobPageStore>
-        },
-        scmDataStore: {
-          type: Object as PropType<ScmMeta>
-        },
-        jobUuid: {
-          type: String
-        }
-    },
     setup(props) {
+        const jobPageStore: JobPageStore = inject(
+            JobPageStoreInjectionKey
+        ) as JobPageStore;
         return {
+            jobPageStore,
             toggleModal: ref(false),
-            scmDataReady: ref(false)
         };
     },
     methods: {
@@ -149,49 +130,34 @@ export default defineComponent({
                 getRundeckContext().projectName,
                 enabled
             );
-        }
+        },
     },
     computed: {
         enabledStatus(): boolean {
-            return this.scmExportEnabled || this.scmImportEnabled
+            return this.scmImport?.enabled || this.scmExport?.enabled;
         },
         authProjectSCMAdmin(): boolean {
-            return this.scmDataStore?.authSCMAdmin()
+            return this.jobPageStore.projAuthz["configure"];
         },
         scmExportEnabled(): boolean {
-          return this.scmDataStore?.getEnabledStatus(EXPORT_META_KEY)
+            return this.scmExport?.enabled;
         },
         scmExportActions(): ScmAction[] {
-          return this.scmDataStore?.getActions(EXPORT_META_KEY);
+            return this.scmExport?.actions;
         },
         scmImportEnabled(): boolean {
-            return this.scmDataStore?.getEnabledStatus(IMPORT_META_KEY)
+            return this.scmExport?.enabled;
         },
         scmImportActions(): ScmAction[] {
-            return this.scmDataStore?.getActions(IMPORT_META_KEY);
+            return this.scmImport?.actions;
         },
         scmExport(): ScmIntegrationMeta | undefined {
-            return this.jobPageStore.findMeta(this.getExportMetaKey());
+            return this.jobPageStore.findMeta("scmExport");
         },
         scmImport(): ScmIntegrationMeta | undefined {
-            return this.jobPageStore.findMeta(this.getImportMetaKey());
+            return this.jobPageStore.findMeta("scmImport");
         },
     },
-    async updated() {
-      this.scmDataReady = true
-      console.log(":::::::::::::::::::.UPDATED JobListScmActions")
-      console.log(this.scmImport)
-      console.log(this.scmExport)
-      console.log(this.jobUuid)
-
-      console.log(this.jobPageStore)
-      console.log("BELOW THE SCM DATA STORE")
-      console.log(this.scmDataStore.getActions("scmExport"))
-      console.log(this.scmDataStore.getCommit("scmExport"))
-      console.log(this.scmDataStore.getSynchState("scmExport"))
-      console.log(this.scmDataStore.getEnabledStatus("scmExport"))
-      console.log("----------------------------------------------")
-    }
 });
 </script>
 
