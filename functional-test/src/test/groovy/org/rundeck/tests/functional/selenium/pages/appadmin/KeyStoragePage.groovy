@@ -55,6 +55,19 @@ class KeyStoragePage extends BasePage {
         saveField.click()
     }
 
+    /**
+     * Does all the required interactions to add a password starting from the Key Storage Main page
+     * @param keyValue
+     * @param storagePath
+     * @param name
+     */
+    void addPasswordSimplified(String keyValue, String storagePath, String name){
+        waitForElementVisible(addUploadKeyField)
+        addUploadKeyField.click()
+        waitForModal 1
+        addPasswordType keyValue, storagePath, name
+    }
+
     void deleteKey(String name, String storagePath) {
         goToKey name, storagePath
 
