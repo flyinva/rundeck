@@ -59,6 +59,9 @@ class SeleniumBase extends BaseContainer implements WebDriver, SeleniumContext {
                         screenshot.renameTo(destination)
                     }
                 }
+    }
+
+    def cleanupSpec(){
         driver?.quit()
     }
 
