@@ -1,0 +1,22 @@
+version: "3"
+services:
+  rundeck:
+    build:
+      context: ""
+      args:
+        IMAGE: ${TEST_IMAGE}
+    environment:
+      RUNDECK_GRAILS_URL: ${TEST_RUNDECK_GRAILS_URL}
+      RUNDECK_TOKENS_FILE: /home/rundeck/server/config/tokens.properties
+      RUNDECK_SERVER_FORWARDED: 'true'
+      RUNDECK_MULTIURL_ENABLED: "true"
+    volumes:
+      - "../../../../tokens.properties:/home/rundeck/server/config/tokens.properties"
+      - "../../../../realm.properties:/home/rundeck/server/config/realm.properties"
+      - "./policy/user.aclpolicy:/home/rundeck/etc/user.aclpolicy"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+  gitbucket:
+    image: gitbucket/gitbucket
+    ports:
+      - "8080:8080"

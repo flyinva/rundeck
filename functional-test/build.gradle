@@ -61,28 +61,32 @@ def checkWarFile(destination, fileName) {
     println "File copied from ${warFile} to ${destination + fileName}"
 }
 
+tasks.withType(Test).configureEach {testTask ->
+    testTask.useJUnitPlatform()
+    testTask.systemProperty('TEST_IMAGE', "rundeck/rundeck:SNAPSHOT")
+    testTask.systemProperty("COMPOSE_PATH", "docker/compose/oss/base/docker-compose.yml")
+}
+
 task apiTest(type: Test){
-    useJUnitPlatform()
-    systemProperty('TEST_IMAGE', "rundeck/rundeck:SNAPSHOT")
-    systemProperty("COMPOSE_PATH", "docker/compose/oss/docker-compose.yml")
     systemProperty('spock.configuration','spock-configs/IncludeAPITestsConfig.groovy')
     description = "Run API tests"
 }
 
 task seleniumCoreTest(type: Test){
-    useJUnitPlatform()
-    systemProperty('TEST_IMAGE', "rundeck/rundeck:SNAPSHOT")
-    systemProperty("COMPOSE_PATH", "docker/compose/oss/docker-compose.yml")
     systemProperty('spock.configuration', 'spock-configs/IncludeSeleniumCoreTestsConfig.groovy')
     description = "Run Rundeck OSS Selenium Tests"
 }
 
 task tomcatTest(type: Test){
-    useJUnitPlatform()
-    systemProperty("DEFAULT_DOCKERFILE_LOCATION", "docker/file/tomcat/Dockerfile")
     systemProperty('spock.configuration', 'spock-configs/IncludeAPITestsConfig.groovy')
     description = "Run Rundeck OSS API Tests on a tomcat environment"
     doFirst{
         checkWarFile("${buildDir}/resources/test/docker/file/tomcat/data/", "rundeck-launcher.war")
     }
+}
+
+task scmTest(type: Test){
+    systemProperty("COMPOSE_PATH", "docker/compose/oss/scm/docker-compose.yml")
+    systemProperty('spock.configuration', 'spock-configs/IncludeScmTestConfig.groovy')
+    description = "Run Rundeck OSS Selenium Tests"
 }
