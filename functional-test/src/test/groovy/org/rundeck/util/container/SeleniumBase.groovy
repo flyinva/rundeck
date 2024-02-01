@@ -22,7 +22,7 @@ class SeleniumBase extends BaseContainer implements WebDriver, SeleniumContext {
     /**
      * Create a driver
      */
-    private WebDriver _driver
+    private static WebDriver _driver
 
     @Delegate
     WebDriver getDriver() {
