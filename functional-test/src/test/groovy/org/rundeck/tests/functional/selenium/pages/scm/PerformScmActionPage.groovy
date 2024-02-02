@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait
 
 import org.rundeck.tests.functional.selenium.helpers.scm.ScmIntegration
 import org.rundeck.tests.functional.selenium.pages.BasePage
+import org.rundeck.util.api.WaitingTime
 import org.rundeck.util.container.SeleniumContext
 import org.rundeck.tests.functional.selenium.helpers.scm.ScmActionId
 
@@ -27,14 +28,19 @@ class PerformScmActionPage extends BasePage {
         loadPath = "/project/${project}"
     }
 
-    String commitJobChanges(String jobUuid, String commitMessage){
+    String commitJobChanges(String jobUuid, String commitMessage, boolean shouldWaitAfterCommit = true){
         loadPath += "/job/${jobUuid}/scm/${INTEGRATION_FOR_COMMIT.name}/${PERFORM_ACTION_URL_PART}${ScmActionId.JOB_COMMIT.name}"
         super.go()
 
         driver.findElement(By.name("pluginProperties.message")).sendKeys(commitMessage)
         driver.findElement(By.name("submit")).click()
 
-        return waitForResultMessageBox().getText()
+        String resultText = waitForResultMessageBox().getText()
+
+        if(shouldWaitAfterCommit)
+            Thread.sleep(WaitingTime.MODERATE.milliSeconds)
+
+        return resultText
     }
 
     void importJobChanges(){

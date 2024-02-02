@@ -2,18 +2,29 @@ package org.rundeck.tests.functional.selenium.helpers.scm
 
 import org.openqa.selenium.By
 import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.ui.ExpectedConditions
+import org.openqa.selenium.support.ui.WebDriverWait
 import org.rundeck.tests.functional.selenium.pages.jobs.JobShowPage
+
+import java.time.Duration
 
 class ScmStatusBadge {
     final List iconClasses
     final String badgeText
     final String tooltips
-    static final By elementSelector = By.xpath("//*[@id='jobInfo_']/span[2]")
+    static final By elementSelector = By.xpath("//*[@id='jobInfo_']/span[2]/span")
+    static final String loadingFromServerText = "Loading Scm Data"
+    static final String tooltipsAttribute = "title"
 
     ScmStatusBadge(JobShowPage jobShowPage){
-        WebElement statusBadge = jobShowPage.driver.findElement(elementSelector)
+        new WebDriverWait(jobShowPage.driver, Duration.ofSeconds(10)).until(
+                ExpectedConditions.not(
+                        ExpectedConditions.textToBe(elementSelector, loadingFromServerText)
+                )
+        )
 
-        this.tooltips = statusBadge.getAttribute("data-original-title")
+        WebElement statusBadge = jobShowPage.driver.findElement(elementSelector)
+        this.tooltips = statusBadge.getAttribute(tooltipsAttribute)
         this.badgeText = statusBadge.getText()
         this.iconClasses = statusBadge.findElement(By.tagName("i")).getAttribute("class").split(" ")
     }
