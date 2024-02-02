@@ -58,7 +58,7 @@ class GormTokenDataProvider implements TokenDataProvider {
             AuthToken token = new AuthToken(
                     token: data.token,
                     authRoles: AuthenticationTokenUtils.generateAuthRoles(data.getAuthRolesSet()),
-                    user: User.get(tokenOwner.getId()),
+                    user: User.findByLogin(data.ownerName),
                     expiration: data.expiration,
                     uuid: id,
                     creator: data.creator,
