@@ -1,4 +1,4 @@
-package org.rundeck.tests.functional.api.export
+package org.rundeck.tests.functional.api.export_import
 
 import org.rundeck.util.annotations.APITest
 import org.rundeck.util.container.BaseContainer

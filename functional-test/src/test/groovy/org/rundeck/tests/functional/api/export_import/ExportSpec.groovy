@@ -1,4 +1,4 @@
-package org.rundeck.tests.functional.api.export
+package org.rundeck.tests.functional.api.export_import
 
 import okhttp3.Headers
 import org.rundeck.util.annotations.APITest

@@ -3,9 +3,11 @@ package org.rundeck.util.container
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.CompileStatic
 import okhttp3.ConnectionPool
+import okhttp3.FormBody
 import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.MediaType
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -13,7 +15,6 @@ import okhttp3.Response
 import okhttp3.ResponseBody
 import org.jetbrains.annotations.NotNull
 
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
@@ -136,6 +137,38 @@ class RdClient {
         Request request = new Request.Builder()
                 .url(apiUrl(path))
                 .method("POST", body)
+                .build()
+        httpClient.newCall(request).execute()
+    }
+
+    Response doPost(final String path, final String file, final String contentType) {
+        RequestBody body = RequestBody.create(file, MediaType.parse(contentType))
+        Request request = new Request.Builder()
+                .url(apiUrl(path))
+                .method("POST", body)
+                .build()
+        httpClient.newCall(request).execute()
+    }
+
+    Response doPostWithMultipart(final String path, final File file, final String multipartName) {
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart(multipartName, file.getName(), RequestBody.create(file, MultipartBody.FORM))
+                .build()
+        Request request = new Request.Builder()
+                .url(apiUrl(path))
+                .post(multipartBody)
+                .build()
+        httpClient.newCall(request).execute()
+    }
+
+    Response doPostWithFormData(final String path, final String fileBody, final String formDataName) {
+        FormBody form = new FormBody.Builder()
+                .addEncoded(formDataName, fileBody)
+                .build()
+        Request request = new Request.Builder()
+                .url(apiUrl(path))
+                .post(form)
                 .build()
         httpClient.newCall(request).execute()
     }
