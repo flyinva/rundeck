@@ -92,6 +92,7 @@ import rundeck.services.ConfigurationService;
  *    rolePrefix="rundeck"
  *    cacheDurationMillis="500"
  *    reportStatistics="true"
+ *    referralControl="follow"
  *    nestedGroups="false";
  *    };
  * </pre>
@@ -155,6 +156,11 @@ public class JettyCachingLdapLoginModule extends AbstractLoginModule {
      */
     protected String _contextFactory;
 
+    /**
+     * Context.REFERRAL
+     */
+    protected String _referralControl = "ignore";
+    
     /**
      * root DN used to connect to
      */
@@ -1067,6 +1073,7 @@ public class JettyCachingLdapLoginModule extends AbstractLoginModule {
             _port = Integer.parseInt((String) options.get("port"));
         }
         _providerUrl = (String) options.get("providerUrl");
+        _referralControl = (String) options.get("referralControl");
         _contextFactory = (String) options.get("contextFactory");
         _bindDn = (String) options.get("bindDn");
         String bindPassword = attemptBindPwdFromRdkConfig();
@@ -1231,6 +1238,8 @@ public class JettyCachingLdapLoginModule extends AbstractLoginModule {
         if (_bindPassword != null) {
             env.put(Context.SECURITY_CREDENTIALS, _bindPassword);
         }
+
+        env.put(Context.REFERRAL, referralControl);
 
         env.put("com.sun.jndi.ldap.read.timeout", Long.toString(_timeoutRead));
         env.put("com.sun.jndi.ldap.connect.timeout", Long.toString(_timeoutConnect));
