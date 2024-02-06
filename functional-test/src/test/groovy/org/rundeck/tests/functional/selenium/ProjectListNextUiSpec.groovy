@@ -12,7 +12,7 @@ class ProjectListNextUiSpec extends SeleniumBase {
     public static final String TEST_PROJECT = "SeleniumBasic"
 
     def setupSpec() {
-        setupProject(TEST_PROJECT, "/projects-import/SeleniumBasic.zip")
+        setupProjectArchiveDirectoryResource(SELENIUM_BASIC_PROJECT, "/projects-import/${SELENIUM_BASIC_PROJECT}")
     }
 
     @Unroll
